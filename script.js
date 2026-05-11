@@ -170,3 +170,41 @@ window.addEventListener('load', () => {
   const serviceParam = new URLSearchParams(window.location.search).get('service');
   if (serviceParam !== null) goToService(parseInt(serviceParam, 10));
 });
+
+// --- BLOG: FILTRO DE CATEGORIAS ---
+const blFilters = document.querySelectorAll('.bl-filter');
+const blCards = document.querySelectorAll('.bl-card[data-cat]');
+const blEmpty = document.getElementById('blEmpty');
+
+blFilters.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    blFilters.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cat = btn.dataset.filter;
+    let visible = 0;
+
+    blCards.forEach((card) => {
+      const match = cat === 'todos' || card.dataset.cat === cat;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    if (blEmpty) blEmpty.style.display = visible === 0 ? 'block' : 'none';
+  });
+});
+
+// --- TREINAMENTOS: TABS DOS FORMATOS ---
+document.querySelectorAll('.tp-tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tp-tab').forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    document.querySelectorAll('.tp-panel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    const panel = document.getElementById('tp-' + btn.dataset.tab);
+    if (panel) {
+      panel.classList.add('active');
+      panel.querySelectorAll('.reveal').forEach((el) => el.classList.add('visible'));
+    }
+  });
+});
