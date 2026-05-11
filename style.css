@@ -822,6 +822,21 @@ em { font-style: normal; font-family: var(--font-serif); }
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
+.btn-ver-blog {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-lg);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-ver-blog:hover {
+  background: var(--accent);
+  color: #fff;
+}
 .bcard {
   background: var(--bg);
   border: 1px solid var(--border);

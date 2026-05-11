@@ -208,3 +208,66 @@ document.querySelectorAll('.tp-tab').forEach((btn) => {
     }
   });
 });
+
+async function carregarPosts() {
+  try {
+
+    const resposta = await fetch(
+      'https://dev.ibnegocios.com.br/blog/wp-json/wp/v2/posts?_embed'
+    );
+
+    const posts = await resposta.json();
+
+    const container = document.getElementById('posts-container');
+
+    container.innerHTML = '';
+
+    posts.slice(0, 3).forEach((post, index) => {
+
+      const imagem =
+        post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+        '';
+
+      const titulo = post.title.rendered;
+
+      const resumo = post.excerpt.rendered
+        .replace(/<[^>]+>/g, '')
+        .substring(0, 120) + '...';
+
+      const link = post.link;
+
+      const delayClass =
+        index === 1 ? 'reveal-d1' :
+        index === 2 ? 'reveal-d2' :
+        '';
+
+      const card = `
+        <a class="bcard ${delayClass}"
+           href="${link}"
+           target="_blank">
+
+          <div class="bcard-img">
+            <img src="${imagem}" alt="${titulo}">
+          </div>
+
+          <div class="bcard-body">
+            <h3>${titulo}</h3>
+            <p>${resumo}</p>
+            <span class="bcard-read">
+              Ler artigo →
+            </span>
+          </div>
+
+        </a>
+      `;
+
+      container.innerHTML += card;
+
+    });
+
+  } catch (erro) {
+    console.error('Erro ao carregar posts:', erro);
+  }
+}
+
+carregarPosts();
