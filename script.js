@@ -172,26 +172,24 @@ window.addEventListener('load', () => {
 });
 
 // --- BLOG: FILTRO DE CATEGORIAS ---
-const blFilters = document.querySelectorAll('.bl-filter');
-const blCards = document.querySelectorAll('.bl-card[data-cat]');
-const blEmpty = document.getElementById('blEmpty');
+document.querySelector('.bl-filters')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.bl-filter');
+  if (!btn) return;
 
-blFilters.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    blFilters.forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
+  document.querySelectorAll('.bl-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-    const cat = btn.dataset.filter;
-    let visible = 0;
+  const cat = btn.dataset.filter;
+  let visible = 0;
 
-    blCards.forEach((card) => {
-      const match = cat === 'todos' || card.dataset.cat === cat;
-      card.style.display = match ? '' : 'none';
-      if (match) visible++;
-    });
-
-    if (blEmpty) blEmpty.style.display = visible === 0 ? 'block' : 'none';
+  document.querySelectorAll('#blGrid .bl-card[data-cat]').forEach(card => {
+    const match = cat === 'todos' || card.dataset.cat === cat;
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
   });
+
+  const blEmpty = document.getElementById('blEmpty');
+  if (blEmpty) blEmpty.style.display = visible === 0 ? 'block' : 'none';
 });
 
 // --- TREINAMENTOS: TABS DOS FORMATOS ---
@@ -209,7 +207,121 @@ document.querySelectorAll('.tp-tab').forEach((btn) => {
   });
 });
 
+let _blogPosts = [];
+
+function abrirArtigo(id) {
+  const post = _blogPosts.find(p => p.id === id);
+  if (!post) return;
+
+  const terms = post._embedded?.['wp:term']?.[0] || [];
+  const mainCat = terms.find(t => t.taxonomy === 'category' && t.name.toLowerCase() !== 'sem categoria');
+  const imgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+  const dataFormatada = new Date(post.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('artModalTitle').innerHTML = post.title.rendered;
+  document.getElementById('artModalBody').innerHTML = post.content.rendered;
+  document.getElementById('artModalCat').textContent = mainCat?.name || '';
+  document.getElementById('artModalMeta').textContent = dataFormatada;
+  document.getElementById('artModalImg').innerHTML = imgSrc
+    ? `<img src="${imgSrc}" alt="${post.title.rendered}">`
+    : '';
+
+  const modal = document.getElementById('artModal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+}
+
+function fecharArtigo() {
+  document.getElementById('artModal')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('artModalClose')?.addEventListener('click', fecharArtigo);
+document.getElementById('artModalOverlay')?.addEventListener('click', fecharArtigo);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharArtigo(); });
+
+async function carregarBlogPosts() {
+  const grid = document.getElementById('blGrid');
+  if (!grid) return;
+
+  const filtersEl = document.querySelector('.bl-filters');
+  const blEmpty = document.getElementById('blEmpty');
+
+  grid.innerHTML = '<div style="text-align:center;padding:3rem;color:#888">Carregando artigos...</div>';
+
+  try {
+    const resposta = await fetch(
+      'https://dev.ibnegocios.com.br/blog/wp-json/wp/v2/posts?_embed&per_page=50'
+    );
+    const posts = await resposta.json();
+    _blogPosts = posts;
+
+    const categorias = new Map();
+    posts.forEach(post => {
+      const terms = post._embedded?.['wp:term']?.[0] || [];
+      terms.forEach(term => {
+        if (term.taxonomy === 'category' && term.name.toLowerCase() !== 'sem categoria') {
+          categorias.set(term.slug, term.name);
+        }
+      });
+    });
+
+    if (filtersEl) {
+      filtersEl.innerHTML = '<button class="bl-filter active" data-filter="todos">Todos</button>';
+      categorias.forEach((name, slug) => {
+        filtersEl.innerHTML += `<button class="bl-filter" data-filter="${slug}">${name}</button>`;
+      });
+    }
+
+    grid.innerHTML = '';
+
+    posts.forEach((post, index) => {
+      const imagem = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+      const titulo = post.title.rendered;
+      const resumo = post.excerpt.rendered.replace(/<[^>]+>/g, '').substring(0, 130) + '...';
+      const link = post.link;
+      const terms = post._embedded?.['wp:term']?.[0] || [];
+      const mainCat = terms.find(t => t.taxonomy === 'category' && t.name.toLowerCase() !== 'sem categoria');
+      const catSlug = mainCat?.slug || '';
+      const catName = mainCat?.name || '';
+      const delayClass = index % 3 === 1 ? 'reveal-d1' : index % 3 === 2 ? 'reveal-d2' : '';
+      const dataFormatada = new Date(post.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const card = document.createElement('a');
+      card.className = `bl-card reveal reveal-zoom ${delayClass}`.trim();
+      card.href = link;
+      card.role = 'button';
+      if (catSlug) card.dataset.cat = catSlug;
+      card.addEventListener('click', (e) => { e.preventDefault(); abrirArtigo(post.id); });
+      card.innerHTML = `
+        <div class="bl-card-img">${imagem ? `<img src="${imagem}" alt="${titulo}" loading="lazy" decoding="async">` : ''}</div>
+        <div class="bl-card-body">
+          ${catName ? `<span class="bl-card-cat">${catName}</span>` : ''}
+          <div class="bl-card-meta">${dataFormatada}</div>
+          <h3>${titulo}</h3>
+          <p>${resumo}</p>
+          <span class="bl-card-read">Ler artigo →</span>
+        </div>
+      `;
+      grid.appendChild(card);
+      revealObserver.observe(card);
+    });
+
+    if (blEmpty) grid.appendChild(blEmpty);
+
+  } catch (erro) {
+    console.error('Erro ao carregar posts do blog:', erro);
+    grid.innerHTML = '<p style="text-align:center;padding:3rem;color:#666">Não foi possível carregar os artigos. Tente novamente mais tarde.</p>';
+  }
+}
+
+if (document.getElementById('blGrid')) carregarBlogPosts();
+
 async function carregarPosts() {
+  const container = document.getElementById('posts-container');
+  if (!container) return;
+
   try {
 
     const resposta = await fetch(
@@ -217,8 +329,6 @@ async function carregarPosts() {
     );
 
     const posts = await resposta.json();
-
-    const container = document.getElementById('posts-container');
 
     container.innerHTML = '';
 

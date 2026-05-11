@@ -6,7 +6,9 @@
       "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('c:\\\\SITE-IBN-DEPLOY-TESTE\\\\blog.html', [System.Text.Encoding]::UTF8\\)\")",
       "Bash(Select-String -Pattern \"Servi|Diferenciais|Quem\")",
       "Bash(Select-Object -First 5)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "WebFetch(domain:dev.ibnegocios.com.br)",
+      "WebFetch(domain:ibnegocios.com.br)"
     ]
   }
 }
