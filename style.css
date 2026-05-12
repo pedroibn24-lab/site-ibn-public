@@ -2840,3 +2840,103 @@ em { font-style: normal; font-family: var(--font-serif); }
 @media (max-width: 600px) {
   .art-modal-content { padding: 1.25rem 1.25rem 2rem; }
 }
+
+/* ─── PRIVACIDADE & TERMOS ──────────────────────────────────── */
+.legal-hero {
+  padding: 100px 24px 60px;
+  text-align: center;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+}
+.legal-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 5vw, 44px);
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.legal-hero p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+.legal-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 24px 0;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.legal-tab-btn {
+  padding: 10px 28px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.legal-tab-btn.active,
+.legal-tab-btn:hover {
+  background: var(--accent);
+  color: #070503;
+  border-color: var(--accent);
+}
+.legal-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+.legal-section { display: none; }
+.legal-section.active { display: block; }
+.legal-section h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--accent);
+  margin: 40px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.legal-section h2:first-child { margin-top: 0; }
+.legal-section p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.legal-section ul {
+  list-style: disc;
+  padding-left: 24px;
+  margin-bottom: 16px;
+}
+.legal-section ul li {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.legal-section strong {
+  color: var(--text);
+}
+.btn-nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.btn-nav-back:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(201,146,42,.08);
+}

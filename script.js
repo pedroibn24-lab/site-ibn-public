@@ -380,4 +380,16 @@ async function carregarPosts() {
   }
 }
 
+// ─── PRIVACIDADE & TERMOS ────────────────────────────────────
+document.querySelectorAll('[id="footer-year"]').forEach(el => {
+  el.textContent = new Date().getFullYear();
+});
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.legal-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
 carregarPosts();
