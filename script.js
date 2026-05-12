@@ -71,8 +71,14 @@ function submitToWhatsApp(event) {
   const servico = document.getElementById('fServico').value.trim();
   const mensagem = document.getElementById('fMensagem').value.trim();
 
+  const consent = document.getElementById('fConsent')?.checked;
+
   if (!nome || !empresa || !email) {
     alert('Por favor, preencha Nome, Empresa e E-mail.');
+    return;
+  }
+  if (!consent) {
+    alert('Por favor, aceite a Política de Privacidade para continuar.');
     return;
   }
 
@@ -391,5 +397,34 @@ function showTab(tab, btn) {
   document.getElementById('tab-' + tab).classList.add('active');
   btn.classList.add('active');
 }
+
+// ─── COOKIE CONSENT BANNER ───────────────────────────────────
+(function initCookieBanner() {
+  if (localStorage.getItem('ibn-cookie-consent')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'cookieBanner';
+  banner.setAttribute('role', 'region');
+  banner.setAttribute('aria-label', 'Aviso de cookies');
+  banner.innerHTML =
+    '<p>Utilizamos cookies para garantir a melhor experiência no site. Ao continuar navegando, você concorda com nossa ' +
+    '<a href="privacidade-e-termos.html">Política de Privacidade</a>.</p>' +
+    '<div class="cookie-actions">' +
+    '<button id="cookieAccept">Aceitar</button>' +
+    '<button id="cookieDecline">Recusar</button>' +
+    '</div>';
+  document.body.appendChild(banner);
+
+  function dismiss(choice) {
+    localStorage.setItem('ibn-cookie-consent', choice);
+    banner.style.transition = 'transform .3s ease, opacity .3s ease';
+    banner.style.transform = 'translateY(100%)';
+    banner.style.opacity = '0';
+    setTimeout(() => banner.remove(), 320);
+  }
+
+  document.getElementById('cookieAccept').addEventListener('click', function() { dismiss('accepted'); });
+  document.getElementById('cookieDecline').addEventListener('click', function() { dismiss('declined'); });
+})();
 
 carregarPosts();
