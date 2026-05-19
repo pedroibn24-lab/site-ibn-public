@@ -272,7 +272,8 @@ function abrirArtigo(id) {
 
   const terms = post._embedded?.['wp:term']?.[0] || [];
   const mainCat = terms.find(t => t.taxonomy === 'category' && t.name.toLowerCase() !== 'sem categoria');
-  const imgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+  const rawImgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+  const imgSrc = rawImgSrc.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cmsDev');
   const dataFormatada = new Date(post.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 
   document.getElementById('artModalTitle').textContent = post.title.rendered;
@@ -348,7 +349,8 @@ async function carregarBlogPosts() {
     grid.innerHTML = '';
 
     posts.forEach((post, index) => {
-      const imagem = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+      const rawImgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+      const imgSrc = rawImgSrc.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cmsDev');
       const titulo = post.title.rendered;
       const resumo = post.excerpt.rendered.replace(/<[^>]+>/g, '').substring(0, 130) + '...';
       const link = post.link;
@@ -368,9 +370,9 @@ async function carregarBlogPosts() {
 
       const imgDiv = document.createElement('div');
       imgDiv.className = 'bl-card-img';
-      if (imagem) {
+      if (imgSrc) {
         const img = document.createElement('img');
-        img.src = imagem;
+        img.src = imgSrc;
         img.alt = titulo;
         img.loading = 'lazy';
         img.decoding = 'async';
@@ -428,9 +430,8 @@ async function carregarPosts() {
 
     posts.slice(0, 3).forEach((post, index) => {
 
-      const imagem =
-        post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-        '';
+      const rawImagem = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+      const imagem = rawImagem.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cmsDev');
 
       const titulo = post.title.rendered;
 
