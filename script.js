@@ -426,38 +426,38 @@ async function carregarPosts() {
   if (!container) return;
 
   try {
-
     const resposta = await fetch(
-      'https://ibnegocios.com.br/cms_Dev/wp-json/wp/v2/posts?_embed'
+      'https://ibnegocios.com.br/cms_Dev/wp-json/wp/v2/posts?_embed&per_page=3'
     );
 
     const posts = await resposta.json();
 
+    posts.forEach(post => {
+      if (!_blogPosts.find(p => p.id === post.id)) _blogPosts.push(post);
+    });
+
     container.innerHTML = '';
 
     posts.slice(0, 3).forEach((post, index) => {
-
       const rawImagem = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
       const imagem = normalizarUrlImagem(rawImagem);
-
       const titulo = post.title.rendered;
-
       const resumo = post.excerpt.rendered
         .replace(/<[^>]+>/g, '')
         .substring(0, 120) + '...';
-
-      const link = post.link;
 
       const delayClass =
         index === 1 ? 'reveal-d1' :
         index === 2 ? 'reveal-d2' :
         '';
 
-      const card = document.createElement('a');
+      const card = document.createElement('div');
       card.className = `bcard ${delayClass}`.trim();
-      card.href = link;
-      card.target = '_blank';
-      card.rel = 'noopener noreferrer';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => abrirArtigo(post.id));
+      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') abrirArtigo(post.id); });
 
       const imgDiv = document.createElement('div');
       imgDiv.className = 'bcard-img';
@@ -483,7 +483,6 @@ async function carregarPosts() {
 
       card.append(imgDiv, bodyDiv);
       container.appendChild(card);
-
     });
 
   } catch (erro) {
