@@ -266,6 +266,13 @@ document.querySelectorAll('.tp-tab').forEach((btn) => {
 
 let _blogPosts = [];
 
+function normalizarUrlImagem(url) {
+  if (!url) return '';
+  return url
+    .replace(/https?:\/\/dev\.ibnegocios\.com\.br\/blog\//g, 'https://ibnegocios.com.br/cms_Dev/')
+    .replace(/https?:\/\/ibnegocios\.com\.br\/cmsDev\//g, 'https://ibnegocios.com.br/cms_Dev/');
+}
+
 function abrirArtigo(id) {
   const post = _blogPosts.find(p => p.id === id);
   if (!post) return;
@@ -273,7 +280,7 @@ function abrirArtigo(id) {
   const terms = post._embedded?.['wp:term']?.[0] || [];
   const mainCat = terms.find(t => t.taxonomy === 'category' && t.name.toLowerCase() !== 'sem categoria');
   const rawImgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
-  const imgSrc = rawImgSrc.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cms_Dev');
+  const imgSrc = normalizarUrlImagem(rawImgSrc);
   const dataFormatada = new Date(post.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 
   document.getElementById('artModalTitle').textContent = post.title.rendered;
@@ -350,7 +357,7 @@ async function carregarBlogPosts() {
 
     posts.forEach((post, index) => {
       const rawImgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
-      const imgSrc = rawImgSrc.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cms_Dev');
+      const imgSrc = normalizarUrlImagem(rawImgSrc);
       const titulo = post.title.rendered;
       const resumo = post.excerpt.rendered.replace(/<[^>]+>/g, '').substring(0, 130) + '...';
       const link = post.link;
@@ -431,7 +438,7 @@ async function carregarPosts() {
     posts.slice(0, 3).forEach((post, index) => {
 
       const rawImagem = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
-      const imagem = rawImagem.replace('dev.ibnegocios.com.br/blog', 'ibnegocios.com.br/cms_Dev');
+      const imagem = normalizarUrlImagem(rawImagem);
 
       const titulo = post.title.rendered;
 
@@ -454,10 +461,14 @@ async function carregarPosts() {
 
       const imgDiv = document.createElement('div');
       imgDiv.className = 'bcard-img';
-      const img = document.createElement('img');
-      img.src = imagem;
-      img.alt = titulo;
-      imgDiv.appendChild(img);
+      if (imagem) {
+        const img = document.createElement('img');
+        img.src = imagem;
+        img.alt = titulo;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        imgDiv.appendChild(img);
+      }
 
       const bodyDiv = document.createElement('div');
       bodyDiv.className = 'bcard-body';
