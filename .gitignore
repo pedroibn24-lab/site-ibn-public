@@ -18,13 +18,7 @@ desktop.ini
 *.bak
 
 # Imagens
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
-*.svg
-*.ico
+
 
 # Dependências (se usar npm futuramente)
 node_modules/
