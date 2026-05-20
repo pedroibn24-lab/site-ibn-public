@@ -371,7 +371,6 @@ async function carregarBlogPosts() {
       const card = document.createElement('a');
       card.className = `bl-card reveal reveal-zoom ${delayClass}`.trim();
       card.href = link;
-      card.setAttribute('role', 'button');
       if (catSlug) card.dataset.cat = catSlug;
       card.addEventListener('click', (e) => { e.preventDefault(); abrirArtigo(post.id); });
 
